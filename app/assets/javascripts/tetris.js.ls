@@ -8,8 +8,10 @@ class Tetris
     @grid = [[false for i from 1 to @numCols] for j from 1 to @numRows]
     @curPiece = @randomPiece!
     @piecePos = { r: 0, c: @numCols/2 - 1 }
+  start: ->
     setInterval @step, 1000
     @bindKeys!
+    @draw!
   pieces:
       [[1 1]
        [1 1]]
@@ -142,8 +144,4 @@ class Tetris
 
 $ ->
   t = new Tetris
-  Window.piece = p = t.randomPiece()
-  /*t.printPiece(p)
-  t.printPiece(t.rotateRight(p))
-  t.printPiece(t.rotateLeft(p))*/
-  t.draw!
+  t.start!
