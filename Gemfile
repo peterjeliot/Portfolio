@@ -2,8 +2,8 @@ source 'https://rubygems.org'
 
 ruby '2.1.2'
 
-# gem 'requirejs-rails'
 gem 'livescript-rails'
+gem 'rails_serve_static_assets'
 
 gem 'rails', '4.2.0'
 gem 'pg'
