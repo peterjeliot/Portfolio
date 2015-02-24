@@ -40,10 +40,13 @@ class Tetris
         @draw!
   moveRight: -> try @piecePos = @move { dc: +1 }
   moveLeft:  -> try @piecePos = @move { dc: -1 }
-  moveDown:  -> try @piecePos = @move { dr: +1 }
+  moveDown:  ->
+    try @piecePos = @move { dr: +1 }
+    /*catch
+      @gluePiece!*/
   moveUp:    -> try @piecePos = @move { dr: -1 } /* Not bound to a key */
   move: ({ dr || 0, dc || 0 }, { r, c } = @piecePos) ->
-    newPos = { nr, nc } = { r: r + dr, c: c + dc }
+    newPos = { r: r + dr, c: c + dc }
     if @on-board(newPos) && ! @is-colliding newPos
       newPos
     else throw new Error "Can't move there."
@@ -95,17 +98,20 @@ class Tetris
   rotateRight: (piece) ->
     maxRow = piece.length - 1
     maxCol = piece[0].length - 1
+    while piece.length + @piecePos.c > @numCols
+      console.log @piecePos
+      @moveLeft!
     return [[piece[r][c] for r from maxRow to 0 by -1] for c from 0 to maxCol]
   printPiece: (piece) ->
     console.log ["\n> " + [piece[r][c] for col, c in row].join("") for row, r in piece].join("")
   draw: ~>
     @canvas.clearRect(0,0,@canvas.width,@canvas.width)
     @drawGrid!
-    @drawPiece!
     @drawPrediction!
+    @drawPiece!
   drawSquare: ({r, c}, color) ->
     @canvas.fillStyle = color
-    @canvas.fillRect(c*20, r*20, 19, 19)
+    @canvas.fillRect(c*20, r*20, 20, 20)
   drawGrid: ->
     for row, r in @grid
       for val, c in row
