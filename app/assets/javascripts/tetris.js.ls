@@ -38,28 +38,29 @@ class Tetris
       unless noKey
         e.preventDefault!
         @draw!
-  moveRight: -> @move { dc: +1 }
-  moveLeft:  -> @move { dc: -1 }
-  moveDown:  -> @move { dr: +1 }
-  moveUp:    -> @move { dr: -1 } /* Not bound to a key */
-  move: ({ dr || 0, dc || 0 }) ->
-    { r, c } = @piecePos
+  moveRight: -> try @piecePos = @move { dc: +1 }
+  moveLeft:  -> try @piecePos = @move { dc: -1 }
+  moveDown:  -> try @piecePos = @move { dr: +1 }
+  moveUp:    -> try @piecePos = @move { dr: -1 } /* Not bound to a key */
+  move: ({ dr || 0, dc || 0 }, { r, c } = @piecePos) ->
     newPos = { nr, nc } = { r: r + dr, c: c + dc }
-    console.log newPos
     if @on-board(newPos) && ! @is-colliding newPos
-      @piecePos = newPos
-    else false
+      newPos
+    else throw new Error "Can't move there."
   on-board: ({ r, c }) ->
     width = @curPiece[0].length
     height = @curPiece.length
     maxRow = @numRows - height
     maxCol = @numCols - width
-    console.log r, c, maxRow, maxCol
     r >= 0 && r <= maxRow && c >= 0 && c <= maxCol
-  drop: ->
-    while @moveDown!
-      /* Keep moving down until failure */
-    @gluePiece!
+  drop: (pos = @piecePos) ->
+    try
+      loop
+        {r, c} = @move { dr: +1 }, pos
+        pos.r = r
+        pos.c = c
+    catch
+      @gluePiece!
   clear-rows: ->
     rows-to-clear = []
     for row, r in @grid
