@@ -53,14 +53,11 @@ class Tetris
     maxRow = @numRows - height
     maxCol = @numCols - width
     r >= 0 && r <= maxRow && c >= 0 && c <= maxCol
-  drop: (pos = @piecePos) ->
+  drop: ->
     try
-      loop
-        {r, c} = @move { dr: +1 }, pos
-        pos.r = r
-        pos.c = c
-    catch
-      @gluePiece!
+      while @moveDown!
+        /* Loop until error is thrown */
+    @gluePiece!
   clear-rows: ->
     rows-to-clear = []
     for row, r in @grid
@@ -105,6 +102,7 @@ class Tetris
     @canvas.clearRect(0,0,@canvas.width,@canvas.width)
     @drawGrid!
     @drawPiece!
+    @drawPrediction!
   drawSquare: ({r, c}, color) ->
     @canvas.fillStyle = color
     @canvas.fillRect(c*20, r*20, 19, 19)
@@ -115,15 +113,22 @@ class Tetris
           | @grid[r][c]  => "red"
           | !@grid[r][c] => "lightgray"
         @drawSquare({r: r, c: c}, color)
-  drawPiece: (piece ? @curPiece) ->
+  drawPiece: (pos ? @piecePos, piece ? @curPiece, pieceColor ? "blue") ->
     for row, dr in piece
       for col, dc in row
         color = switch
-          | piece[dr][dc]  => "blue"
+          | piece[dr][dc]  => pieceColor
           | !piece[dr][dc] => "transparent"
-        r = dr + @piecePos.r
-        c = dc + @piecePos.c
+        r = dr + pos.r
+        c = dc + pos.c
         @drawSquare({r: r, c: c}, color)
+  drawPrediction: ->
+    pos = ^^@piecePos
+    try
+      loop
+        pos = @move { dr: +1 }, pos
+    @drawPiece pos, @curPiece, "orange"
+
 
 $ ->
   t = new Tetris
