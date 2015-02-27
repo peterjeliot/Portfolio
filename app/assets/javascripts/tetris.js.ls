@@ -2,15 +2,15 @@ import prelude
 
 class Tetris
   ->
-    @canvas = document.getElementById "tetris" .getContext "2d"
-    @numRows = 18
-    @numCols = 10
-    @grid = [[0 for i from 1 to @numCols] for j from 1 to @numRows]
-    @curPiece = @randomPiece!
-    @piece-pos = { r: 0, c: @numCols/2 - 1 }
+    @canvas = document.get-element-by-id "tetris" .get-context "2d"
+    @num-rows = 18
+    @num-cols = 10
+    @grid = [[0 for i from 1 to @num-cols] for j from 1 to @num-rows]
+    @cur-piece = @random-piece!
+    @piece-pos = { r: 0, c: @num-cols/2 - 1 }
   start: ->
-    setInterval @step, 1000
-    @bindKeys!
+    set-interval @step, 1000
+    @bind-keys!
     @draw!
   pieces:
       [[1 1]
@@ -29,40 +29,40 @@ class Tetris
   step: ~>
     @piece-pos.r += 1
     if @is-colliding!
-      @moveUp!
-      @gluePiece!
+      @move-up!
+      @glue-piece!
     @draw!
-  bindKeys: ->
+  bind-keys: ->
     $ document .keydown (e) ~>
       switch e.which
-        | 37 => @moveLeft!
-        | 39 => @moveRight!
-        | 40 => @moveDown!
+        | 37 => @move-left!
+        | 39 => @move-right!
+        | 40 => @move-down!
         | 32 => @drop!
-        | 38 => @curPiece = @rotateRight @curPiece
-        |  _ => noKey = true
-      unless noKey
-        e.preventDefault!
+        | 38 => @cur-piece = @rotate-right @cur-piece
+        |  _ => no-key = true
+      unless no-key
+        e.prevent-default!
         @draw!
-  moveRight: -> if @move { dc: +1 } => @piece-pos = that
-  moveLeft:  -> if @move { dc: -1 } => @piece-pos = that
-  moveDown:  -> if @move { dr: +1 } => @piece-pos = that
-  moveUp:    -> if @move { dr: -1 } => @piece-pos = that /* Not bound to a key */
+  move-right: -> if @move { dc: +1 } => @piece-pos = that
+  move-left:  -> if @move { dc: -1 } => @piece-pos = that
+  move-down:  -> if @move { dr: +1 } => @piece-pos = that
+  move-up:    -> if @move { dr: -1 } => @piece-pos = that /* Not bound to a key */
   move: ({ dr || 0, dc || 0 }, { r, c } = @piece-pos) ->
-    newPos = { r: r + dr, c: c + dc }
-    if @on-board(newPos) && ! @is-colliding newPos
-      newPos
+    new-pos = { r: r + dr, c: c + dc }
+    if @on-board(new-pos) && ! @is-colliding new-pos
+      new-pos
     else false
   on-board: ({ r, c }) ->
-    width = @curPiece[0].length
-    height = @curPiece.length
-    maxRow = @numRows - height
-    maxCol = @numCols - width
-    r >= 0 && r <= maxRow && c >= 0 && c <= maxCol
+    width = @cur-piece[0].length
+    height = @cur-piece.length
+    max-row = @num-rows - height
+    max-col = @num-cols - width
+    r >= 0 && r <= max-row && c >= 0 && c <= max-col
   drop: ->
-    while @moveDown! then;
+    while @move-down! then;
     /* Loop until error is thrown */
-    @gluePiece!
+    @glue-piece!
   clear-rows: ->
     rows-to-clear = []
     for row, r in @grid
@@ -72,70 +72,70 @@ class Tetris
       |> each @clear-row
   clear-row: (r) ~>
     @grid.splice r, 1
-    @grid.unshift [0 for r from 1 to @numCols]
+    @grid.unshift [0 for r from 1 to @num-cols]
   is-colliding: (pos ? @piece-pos)->
-    | pos.r + @curPiece.length > @numRows
+    | pos.r + @cur-piece.length > @num-rows
       then true
     | _ then
-      for row, r in @curPiece
+      for row, r in @cur-piece
         for val, c in row
           return true if val && @grid[r + pos.r][c + pos.c]
-  gluePiece: ->
-    for row, r in @curPiece
+  glue-piece: ->
+    for row, r in @cur-piece
       for val, c in row
        @grid[r + @piece-pos.r][c + @piece-pos.c] ||= val
     @clear-rows!
-    @newPiece!
-    @checkLose!
-  newPiece: ->
-    @curPiece = @randomPiece!
-    @piece-pos = { r: 0, c: Math.floor (@numCols - @curPiece[0].length)/2 }
-  randomPiece: ->
+    @new-piece!
+    @check-lose!
+  new-piece: ->
+    @cur-piece = @random-piece!
+    @piece-pos = { r: 0, c: Math.floor (@num-cols - @cur-piece[0].length)/2 }
+  random-piece: ->
     return @pieces[Math.floor(Math.random! * @pieces.length)]
-  rotateLeft: (piece) ->
-    maxRow = piece.length - 1
-    maxCol = piece[0].length - 1
-    return [[piece[r][c] for r from 0 to maxRow] for c from maxCol to 0 by -1]
-  rotateRight: (piece) ->
-    maxRow = piece.length - 1
-    maxCol = piece[0].length - 1
-    while piece.length + @piece-pos.c > @numCols
-      @moveLeft!
-    return [[piece[r][c] for r from maxRow to 0 by -1] for c from 0 to maxCol]
+  rotate-left: (piece) ->
+    max-row = piece.length - 1
+    max-col = piece[0].length - 1
+    return [[piece[r][c] for r from 0 to max-row] for c from max-col to 0 by -1]
+  rotate-right: (piece) ->
+    max-row = piece.length - 1
+    max-col = piece[0].length - 1
+    while piece.length + @piece-pos.c > @num-cols
+      @move-left!
+    return [[piece[r][c] for r from max-row to 0 by -1] for c from 0 to max-col]
   draw: ~>
-    @canvas.clearRect(0,0,@canvas.width,@canvas.width)
-    @drawGrid!
-    @drawPrediction!
-    @drawPiece!
-  drawSquare: ({r, c}, color) ->
-    @canvas.fillStyle = color
-    @canvas.fillRect(c*20, r*20, 20, 20)
-  drawGrid: ->
+    @canvas.clear-rect(0,0,@canvas.width,@canvas.width)
+    @draw-grid!
+    @draw-prediction!
+    @draw-piece!
+  draw-square: ({r, c}, color) ->
+    @canvas.fill-style = color
+    @canvas.fill-rect(c*20, r*20, 20, 20)
+  draw-grid: ->
     for row, r in @grid
       for val, c in row
         color = switch
           | @grid[r][c]  => "red"
           | !@grid[r][c] => "lightgray"
-        @drawSquare({ r: r, c: c }, color)
-  drawPiece: (pos ? @piece-pos, piece ? @curPiece, pieceColor ? "blue") ->
+        @draw-square({ r: r, c: c }, color)
+  draw-piece: (pos ? @piece-pos, piece ? @cur-piece, piece-color ? "blue") ->
     for row, dr in piece
       for col, dc in row
         color = switch
-          | piece[dr][dc]  => pieceColor
+          | piece[dr][dc]  => piece-color
           | !piece[dr][dc] => "transparent"
         r = dr + pos.r
         c = dc + pos.c
-        @drawSquare({r: r, c: c}, color)
-  drawPrediction: ->
+        @draw-square({r: r, c: c}, color)
+  draw-prediction: ->
     pos = ^^@piece-pos
     while @move { dr: +1 }, pos
       pos = that
-    @drawPiece pos, @curPiece, "orange"
+    @draw-piece pos, @cur-piece, "orange"
   check-lose: ->
     if @is-lost!
       console.log("You lose :(")
   is-lost: ->
-    @piecePos.r == 0 && @is-colliding!
+    @piece-pos.r == 0 && @is-colliding!
 
 
 $ ->
