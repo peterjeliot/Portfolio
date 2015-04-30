@@ -1,0 +1,14 @@
+.tetris {
+  margin-top-max: calc((100% - 360px) / 2);
+  margin-top: 50px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 475px;
+}
+.tetris canvas {
+  float: left;
+  margin-right: 5px;
+  border-style: dotted dotted dotted dotted;
+  border-width: 2px;
+  border-color: #080;
+}
