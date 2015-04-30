@@ -12,5 +12,6 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require underscore
 //= require prelude
 //= require_tree .
