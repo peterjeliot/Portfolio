@@ -1,3 +1,4 @@
 [submodule "app/assets/javascripts/tetris"]
 	path = app/assets/javascripts/tetris
-	url = https://peterjeliot:***REMOVED***@github.com/peterjeliot/Tetris.ls
+	# Removed because of security flaw
+	#url = https://phoenixeliot:REDACTED@github.com/phoenixeliot/Tetris.ls
